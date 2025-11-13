@@ -1,0 +1,6 @@
+{
+    "nrf-connect.applications": [
+        "${workspaceFolder}\\beacons\\blinky"
+    ],
+    "cmake.sourceDirectory": "C:/Users/colin/Documents/GitHub/Personal/ble-positioning/beacons/blinky"
+}
