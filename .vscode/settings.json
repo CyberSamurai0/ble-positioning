@@ -3,5 +3,5 @@
         "${workspaceFolder}\\beacons\\blinky",
         "${workspaceFolder}\\beacons\\broadcast"
     ],
-    "cmake.sourceDirectory": "C:/Users/colin/Documents/GitHub/Personal/ble-positioning/beacons/blinky"
+    "cmake.sourceDirectory": "C:/Users/colin/OneDrive/Documents/GitHub/Personal/ble-positioning/beacons/broadcast"
 }
