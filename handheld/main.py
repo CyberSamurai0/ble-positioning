@@ -15,15 +15,26 @@ async def main():
     # adv_data: https://bleak.readthedocs.io/en/latest/backends/index.html#bleak.backends.scanner.AdvertisementData
     def callback(device, adv_data):
         stop_event.set()
+
+        # Print MAC Address and the hardcoded friendly name
         print(f"Device: {color.blue(device.address)} ({color.blue(device.name)})")
 
+        print(f"\tLocal Name: {color.green(adv_data.local_name)}")
+
+        # Print the manufacturer's data payload.
+        # This traditionally consists of an integer ID assigned to the manufacturer
+        # and a bytestring data payload. UTF-8 decoding tends to error :(
+        # Manufacturer IDs: https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf#page=217
         print("\tManufacturer Data: {")
         for manufacturer_id, value in adv_data.manufacturer_data.items():
-            print(f"\t\t{color.yellow(manufacturer_id)}: {color.green(value)}")
+            print(f"\t\t{color.yellow(hex(manufacturer_id))}: {color.green(value)}")
         print("\t}")
 
+        # This is an unstable field and probably does not need to be used.
         # print(f"\tPlatform Data: ({adv_data.platform_data})")
 
+        # So far, this field is empty on all received packets. That may not hold
+        # true once we dive into testing!
         print(f"\tService Data: {adv_data.service_data}")
         # print("\tService Data:")
         # for key, value in adv_data.service_data.items():
