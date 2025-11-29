@@ -10,7 +10,10 @@
 //static const POSITION[] = {1,5}; // Sample XY Coordinate System
 
 #define LED0_NODE DT_ALIAS(led0)
+#define LED2_NODE DT_ALIAS(led2)
+
 static const struct gpio_dt_spec RED_LED = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+static const struct gpio_dt_spec BLUE_LED = GPIO_DT_SPEC_GET(LED2_NODE, gpios);
 
 // Create a semaphore that starts a 0 with a maximum number of 1
 // This allows us to delay main execution until on_bt_ready signals
@@ -80,6 +83,11 @@ int main(void) {
     }
 
     printk("Bluetooth initialized\n");
+
+    // Turn on red LED to indicate error
+    if (gpio_is_ready_dt(&BLUE_LED)) {
+        gpio_pin_configure_dt(&BLUE_LED, GPIO_OUTPUT_ACTIVE);
+    }
 }
 
 
