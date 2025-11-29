@@ -38,11 +38,11 @@ async def main():
 
         # So far, this field is empty on all received packets. That may not hold
         # true once we dive into testing!
-        print(f"\tService Data: {adv_data.service_data}")
-        # print("\tService Data:")
-        # for key, value in adv_data.service_data.items():
-        #     print(color.green(f"\t\t\"{key}\"") + ":", color.green(value))
-        # print("\t")
+        # print(f"\tService Data: {adv_data.service_data}")
+        print("\tService Data: {")
+        for uuid, value in adv_data.service_data.items():
+            print(color.yellow(f"\t\t0x{uuid[4:8]}") + ":", color.green(value))
+        print("\t}")
 
         #print(f"\tPayload: \x1b[32m{adv_data.manufacturer_data}\x1b[0m")
         print(f"\tRSSI: \x1b[33m{adv_data.rssi}\x1b[0m")
