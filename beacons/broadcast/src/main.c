@@ -101,4 +101,7 @@ static void on_bt_ready(int err) {
     }
 
     printk("Bluetooth initialized\n");
+
+    // Signal that Bluetooth initialization is complete
+    k_sem_give(&ble_init_ok);
 }
