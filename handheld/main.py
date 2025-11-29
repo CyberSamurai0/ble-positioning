@@ -14,7 +14,10 @@ async def main():
     # device: https://bleak.readthedocs.io/en/latest/api/index.html#bleak.backends.device.BLEDevice
     # adv_data: https://bleak.readthedocs.io/en/latest/backends/index.html#bleak.backends.scanner.AdvertisementData
     def callback(device, adv_data):
-        stop_event.set()
+        if device.name != "blepos":
+            return
+
+        #stop_event.set()
 
         # Print MAC Address and the hardcoded friendly name
         print(f"Device: {color.blue(device.address)} ({color.blue(device.name)})")
