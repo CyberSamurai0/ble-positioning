@@ -46,7 +46,7 @@ async def main():
 
         #print(f"\tPayload: \x1b[32m{adv_data.manufacturer_data}\x1b[0m")
         print(f"\tRSSI: \x1b[33m{adv_data.rssi}\x1b[0m")
-        print(f"\tTx Power: \x1b[33m{adv_data.tx_power}\x1b[0m")
+        #print(f"\tTx Power: \x1b[33m{adv_data.tx_power}\x1b[0m")
         # print(adv_data)
 
 
