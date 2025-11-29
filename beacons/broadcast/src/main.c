@@ -3,6 +3,9 @@
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/drivers/gpio.h>
 
+#define VERSION_MAJOR '0'
+#define VERSION_MINOR '1'
+#define VERSION_PATCH '5'
 
 //static const POSITION[] = {1,5}; // Sample XY Coordinate System
 
@@ -55,6 +58,9 @@ static const struct bt_le_adv_param *adv_params = BT_LE_ADV_PARAM(
  *  Entrypoint Function  *
  *************************/
 int main(void) {
+    printk("===== BLE Positioning =====\n");
+    printk("v%c.%c.%c\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+
     int err = bt_enable(on_bt_ready);
 
     if (err) {
