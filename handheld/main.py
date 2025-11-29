@@ -2,11 +2,21 @@
 import asyncio
 from bleak import BleakScanner
 import tty_color as color
+import position
+import azure_api as cloud
+from local_web import API
 
 async def main():
     print("CNIT 546 BLE Positioning")
     print("")
     print("Scan Results:")
+
+    # Store calculated position value
+    pos = position.Position()
+
+    # Create Quark endpoint
+    web = API(pos)
+    server_task = asyncio.create_task(web.run())
 
     # Reference: https://bleak.readthedocs.io/en/latest/api/scanner.html#starting-and-stopping
     stop_event = asyncio.Event()
