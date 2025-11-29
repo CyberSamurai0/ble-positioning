@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <zephyr/kernel.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/drivers/gpio.h>
@@ -8,6 +9,15 @@
 #define VERSION_PATCH '5'
 
 //static const POSITION[] = {1,5}; // Sample XY Coordinate System
+static const uint8_t service_data[] = {
+    // Use Indoor Positioning Service Shorthand UUID
+    0x21, 0x18, // 16-bit shorthand UUID (little endian)
+    2, 6 // Sample XY Coordinate System
+};
+
+static const struct bt_data adv_payload[] = {
+    BT_DATA(BT_DATA_SVC_DATA16, service_data, sizeof(service_data)),
+};
 
 #define LED0_NODE DT_ALIAS(led0)
 #define LED2_NODE DT_ALIAS(led2)
@@ -46,12 +56,12 @@ static void on_bt_ready(int err);
 // Define the parameters used to send advertisements
 static const struct bt_le_adv_param *adv_params = BT_LE_ADV_PARAM(
     // Advertising options
-    // Do not use BT_LE_ADV_OPT_CONNECTABLE
-    // Do not use BT_LE_ADV_OPT_EXT_ADV as we want backward compatibility
-    BT_LE_ADV_OPT_SCANNABLE | 
-    BT_LE_ADV_OPT_USE_NAME |
-    BT_LE_ADV_OPT_USE_TX_POWER, 
-    
+    // Do not use BT_LE_ADV_OPT_EXT_ADV as we want backward compatibility with BLE 4.0
+    //BT_LE_ADV_OPT_CONN | // Advertise as connectable
+    BT_LE_ADV_OPT_SCANNABLE | // Advertise as scannable
+    //BT_LE_ADV_OPT_USE_IDENTITY | // Uses the true MAC rather than randomized
+    BT_LE_ADV_OPT_USE_NAME,
+
     ADV_INTERVAL_MIN, // Minimum interval
     ADV_INTERVAL_MAX, // Maximum interval
     NULL // No peer address, use undirected advertising
@@ -82,7 +92,12 @@ int main(void) {
         error(); // Block further execution with error handling
     }
 
-    printk("Bluetooth initialized\n");
+    err = bt_le_adv_start(adv_params, adv_payload, ARRAY_SIZE(adv_payload), NULL, 0);
+
+    if (err) {
+        printk("Advertising failed to start (err %d)\n", err);
+        error(); // Block further execution with error handling
+    }
 
     // Turn on red LED to indicate error
     if (gpio_is_ready_dt(&BLUE_LED)) {
