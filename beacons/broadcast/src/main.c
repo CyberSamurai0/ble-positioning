@@ -22,6 +22,8 @@ static const uint8_t service_data[] = {
 static const struct bt_data adv_payload[] = {
     BT_DATA(BT_DATA_MANUFACTURER_DATA, manufacturer_data, sizeof(manufacturer_data)),
     BT_DATA(BT_DATA_SVC_DATA16, service_data, sizeof(service_data)),
+    // Optional Bluetooth display icon if we use the connectable state
+    //BT_DATA_BYTES(BT_DATA_GAP_APPEARANCE, BT_BYTES_LIST_LE16(BT_APPEARANCE_SENSOR_WALL_MOUNTED)),
 };
 
 #define LED0_NODE DT_ALIAS(led0)
