@@ -8,7 +8,11 @@
 #define VERSION_MINOR '1'
 #define VERSION_PATCH '5'
 
-//static const POSITION[] = {1,5}; // Sample XY Coordinate System
+static const uint8_t manufacturer_data[] = {
+    0xFF, 0xFF, // Company ID (0xFFFF for testing)
+    'v', VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
+};
+
 static const uint8_t service_data[] = {
     // Use Indoor Positioning Service Shorthand UUID
     0x21, 0x18, // 16-bit shorthand UUID (little endian)
@@ -16,6 +20,7 @@ static const uint8_t service_data[] = {
 };
 
 static const struct bt_data adv_payload[] = {
+    BT_DATA(BT_DATA_MANUFACTURER_DATA, manufacturer_data, sizeof(manufacturer_data)),
     BT_DATA(BT_DATA_SVC_DATA16, service_data, sizeof(service_data)),
 };
 
