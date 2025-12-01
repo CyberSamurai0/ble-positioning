@@ -1,5 +1,5 @@
 import numbers
-
+from collections import deque
 from position import Position
 import time
 
@@ -23,10 +23,25 @@ class SensorCache:
         if type(pos) is not Position:
             return
 
-        self.cache[pos.tup()] = {
-            'rssi': rssi,
-            'time': time.time(),
-        }
+        key = pos.tup()
+        entry = self.cache.get(key)
+        if entry is None:
+            entry = {
+                # Store a history of RSSI values to smooth out fluctuations
+                'history': deque(maxlen=5),
+                'time': 0,
+                'avg_rssi': 0,
+            }
+        
+        entry['history'].append(rssi)
+        entry['time'] = time.time()
+
+        # Compute average and variance
+        vals = list(entry['history'])
+        entry['avg_rssi'] = sum(vals) / len(vals)
+
+        # Update the cache
+        self.cache[key] = entry
 
 
     def clear_old_sensors(self):
