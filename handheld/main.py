@@ -14,7 +14,7 @@ async def main():
     # Store calculated position value
     pos = position.Position()
 
-    # Create Quark endpoint
+    # Create Quart endpoint
     web = API(pos)
     server_task = asyncio.create_task(web.run())
 
