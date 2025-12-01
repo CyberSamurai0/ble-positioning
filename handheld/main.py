@@ -5,6 +5,8 @@ import tty_color as color
 import position
 import azure_api as cloud
 from local_web import API
+from sensors import SensorCache
+
 
 async def main():
     print("CNIT 546 BLE Positioning")
@@ -13,6 +15,8 @@ async def main():
 
     # Store calculated position value
     pos = position.Position()
+
+    sensors = SensorCache(5)
 
     # Create Quart endpoint
     web = API(pos)
