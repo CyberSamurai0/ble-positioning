@@ -34,7 +34,7 @@ class SensorCache:
         to_remove = []
         for pos, val in self.cache.items():
             # If we haven't heard from a beacon in the expiry time
-            if self.expiry_time != 0 and val.time < time.time() - self.expiry_time:
+            if self.expiry_time != 0 and val['time'] < time.time() - self.expiry_time:
                 to_remove.append(pos)
 
         for pos in to_remove:
