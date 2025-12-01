@@ -5,6 +5,7 @@ class Position:
         self.building_id = building_id
         self.floor = floor
 
+    # Return the Position class as a dictionary
     def dict(self):
         return {
             "loc_north": self.loc_north,
@@ -12,3 +13,7 @@ class Position:
             "building_id": self.building_id,
             "floor": self.floor,
         }
+
+    # Return the Position class as a tuple
+    def tup(self):
+        return self.building_id, self.floor, self.loc_north, self.loc_east
