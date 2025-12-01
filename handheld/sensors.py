@@ -18,6 +18,7 @@ class SensorCache:
         # selection more costly.
         self.expiry_time = expiry_time
 
+
     def record_sensor(self, pos, rssi):
         if type(pos) is not Position:
             return
@@ -26,6 +27,7 @@ class SensorCache:
             'rssi': rssi,
             'time': time.time(),
         }
+
 
     def clear_old_sensors(self):
         # Avoid concurrent modification
@@ -39,12 +41,14 @@ class SensorCache:
             # Remove the dictionary entry
             del self.cache[pos]
 
+
     def get_best_sensors(self):
         # Prioritize recency, then proximity
         # Return three cache objects (position and RSSI)
 
         #
         return None, None, None
+
 
     def trilaterate(self):
         a, b, c = self.get_best_sensors()
