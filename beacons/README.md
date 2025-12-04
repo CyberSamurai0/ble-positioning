@@ -15,11 +15,11 @@ Two helper scripts have been created to enhance the compilation/flashing workflo
 
 | Field                |  Bytes  | Value                                                                                                                      |
 |:---------------------|:-------:|----------------------------------------------------------------------------------------------------------------------------|
-| Data Length          |    1    | 7 bytes of Manufacturer Data                                                                                               |
+| Data Length          |    1    | `7` bytes of Manufacturer Data                                                                                               |
 | Data Type            |    1    | `0xFF` - Manufacturer Data                                                                                                 |
 | Manufacturer ID      |    2    | `0xFFFF` - Test Identifier                                                                                                 |
 | Version              |    4    | `'v'` followed by the major, minor, and patch version number                                                               |
-| Data Length          |    1    | 7 bytes of Service Data                                                                                                    |
+| Data Length          |    1    | `7` bytes of Service Data                                                                                                    |
 | Data Type            |    1    | `0x16` - Service Data                                                                                                      |
 | Service ID           |    2    | `0x1821` - Shorthand ID for Indoor Positioning Service                                                                     |
 | Building ID          |    2    | Configured per device                                                                                                      |
