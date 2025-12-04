@@ -1,6 +1,7 @@
 const MIN_ZOOM = -3;
 const MAX_ZOOM = 0;
 const DISABLE_ZOOM = false;
+const SHOW_BEACONS = true; // TODO disable beacon markers in release
 
 let map = L.map("map", {
     crs: L.CRS.Simple,
