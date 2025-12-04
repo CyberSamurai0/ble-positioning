@@ -1,0 +1,20 @@
+[
+  {
+    "loc_north": 2550,
+    "loc_east": 2050,
+    "building": 1,
+    "floor": 4
+  },
+  {
+    "loc_north": 1600,
+    "loc_east": 1780,
+    "building": 1,
+    "floor": 4
+  },
+  {
+    "loc_north": 2075,
+    "loc_east": 1318,
+    "building": 1,
+    "floor": 4
+  }
+]
