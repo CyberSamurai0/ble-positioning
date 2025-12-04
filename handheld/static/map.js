@@ -25,7 +25,7 @@ map.on('mousemove', e => {
     const coordinateBox = document.getElementById('coordinate-box');
     const lat = e.latlng.lat.toFixed(2); // Limit to 4 decimal places
     const lng = e.latlng.lng.toFixed(2);
-    coordinateBox.textContent = `Coordinates: (${lat}, ${lng})`;
+    coordinateBox.textContent = `Coordinates: (${lat}, ${lng})\r\nFeet: (${(lat/30).toFixed(2)}, ${(lng/30).toFixed(2)})`;
 });
 
 getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
