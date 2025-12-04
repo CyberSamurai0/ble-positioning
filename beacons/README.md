@@ -10,3 +10,22 @@ Rather than overwrite the included bootloader, this project utilizes the Arduino
 Two helper scripts have been created to enhance the compilation/flashing workflow.
 - Windows users can drag and drop the `.hex` file onto [hex-to-uf2.bat](.\hex-to-uf2.bat).
 - Linux users can provide the `.hex` file as an argument of [./hex-to-uf2.sh](.\hex-to-uf2.sh).
+
+## Advertisement Payload Format
+
+| Field                |  Bytes  | Value                                                                                                                         |
+|:---------------------|:-------:|-------------------------------------------------------------------------------------------------------------------------------|
+| Data Length          |    1    | 7 bytes of Manufacturer Data                                                                                                  |
+| Data Type            |    1    | `0xFF` - Manufacturer Data                                                                                                    |
+| Manufacturer ID      |    2    | `0xFFFF` - Test Identifier                                                                                                    |
+| Version              |    4    | `'v'` followed by the major, minor, and patch version number                                                                  |
+| Data Length          |    1    | 7 bytes of Service Data                                                                                                       |
+| Data Type            |    1    | `0x16` - Service Data                                                                                                         |
+| Service ID           |    2    | `0x1821` - Shorthand ID for Indoor Positioning Service                                                                        |
+| Building ID          |    2    | Configured per device                                                                                                         |
+| Floor ID             |    1    | Configured per device                                                                                                         |
+| Local North Position |    2    | [Half Precision Floating Point](https://en.wikipedia.org/wiki/Half-precision_floating-point_format)<br/>Configured per device |
+| Local East Position  |    2    | [Half Precision Floating Point](https://en.wikipedia.org/wiki/Half-precision_floating-point_format)<br/>Configured per device |
+
+### Local Position Coordinates
+Position values are stored as [16-bit floating point numbers](https://en.wikipedia.org/wiki/Half-precision_floating-point_format) representing the number of feet from the building's origin position. Float16 values can represent the range ±65,504 with a 10-bit fractional component.
