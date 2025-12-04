@@ -1,5 +1,5 @@
-# Use the Bluetooth Low Energy platform Agnostic Klient (BLEAK) library
 import asyncio
+# Use the Bluetooth Low Energy platform Agnostic Klient (BLEAK) library
 from bleak import BleakScanner
 import tty_color as color
 import position
