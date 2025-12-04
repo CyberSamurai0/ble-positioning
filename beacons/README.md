@@ -13,19 +13,19 @@ Two helper scripts have been created to enhance the compilation/flashing workflo
 
 ## Advertisement Payload Format
 
-| Field                |  Bytes  | Value                                                                                                                      |
-|:---------------------|:-------:|----------------------------------------------------------------------------------------------------------------------------|
-| Data Length          |    1    | `7` bytes of Manufacturer Data                                                                                             |
-| Data Type            |    1    | `0xFF` - Manufacturer Data                                                                                                 |
-| Manufacturer ID      |    2    | `0xFFFF` - Test Identifier                                                                                                 |
-| Version              |    4    | `'v'` followed by the major, minor, and patch version number                                                               |
-| Data Length          |    1    | `10` bytes of Service Data                                                                                                 |
-| Data Type            |    1    | `0x16` - Service Data                                                                                                      |
-| Service ID           |    2    | `0x1821` - Shorthand ID for Indoor Positioning Service                                                                     |
-| Building ID          |    2    | Configured per device                                                                                                      |
-| Floor ID             |    1    | Configured per device                                                                                                      |
-| Local North Position |    2    | [Half Precision Floating Point](https://en.wikipedia.org/wiki/Half-precision_floating-point_format), configured per device |
-| Local East Position  |    2    | [Half Precision Floating Point](https://en.wikipedia.org/wiki/Half-precision_floating-point_format), configured per device |
+| Field                |  Bytes  | Value                                                                                                                                    |
+|:---------------------|:-------:|------------------------------------------------------------------------------------------------------------------------------------------|
+| Data Length          |    1    | `7` bytes of Manufacturer Data                                                                                                           |
+| Data Type            |    1    | `0xFF` - Manufacturer Data                                                                                                               |
+| Manufacturer ID      |    2    | `0xFFFF` - Test Identifier                                                                                                               |
+| Version              |    4    | `'v'` followed by the major, minor, and patch version number                                                                             |
+| Data Length          |    1    | `10` bytes of Service Data                                                                                                               |
+| Data Type            |    1    | `0x16` - Service Data                                                                                                                    |
+| Service ID           |    2    | `0x1821` - Shorthand ID for [Indoor Positioning Service](https://www.bluetooth.com/specifications/specs/indoor-positioning-service-1-0/) |
+| Building ID          |    2    | Configured per device                                                                                                                    |
+| Floor ID             |    1    | Configured per device                                                                                                                    |
+| Local North Position |    2    | [Half Precision Floating Point](https://en.wikipedia.org/wiki/Half-precision_floating-point_format), configured per device               |
+| Local East Position  |    2    | [Half Precision Floating Point](https://en.wikipedia.org/wiki/Half-precision_floating-point_format), configured per device               |
 
 ### Local Position Coordinates
 Position values are stored as [16-bit floating point numbers](https://en.wikipedia.org/wiki/Half-precision_floating-point_format) representing the number of feet from the building's origin position. Float16 values can represent the range ±65,504 with a 10-bit fractional component.
