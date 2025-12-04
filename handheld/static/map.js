@@ -31,8 +31,6 @@ map.on('mousemove', e => {
 
 getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
     console.log("Image dimensions:", dimensions);
-
-
     
     let bounds = [[0, 0], [dimensions.height, dimensions.width]];
     let image = L.imageOverlay("./floorplans/0001-04.png", bounds).addTo(map)
@@ -40,3 +38,39 @@ getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
     map.fitBounds(bounds);
     map.setView([dimensions.height-(dimensions.height/2), dimensions.width/2], -2)
 });
+
+
+/***** RETRIEVE LATEST BEACON POSITIONS *****/
+if (SHOW_BEACONS) {
+    let beacons = [];
+
+    function addBeacon(lat, long) {
+        L.marker([lat, long]).addTo(map);
+    }
+
+    function updateBeacons() {
+        for (let beacon of beacons) {
+            if (beacon.hasOwnProperty("loc_north") && beacon.hasOwnProperty("loc_east")) {
+                addBeacon(beacon.loc_north, beacon.loc_east);
+            }
+        }
+    }
+
+    let beaconsHTTP = new XMLHttpRequest();
+    beaconsHTTP.onreadystatechange = () => {
+        if (beaconsHTTP.readyState === 4 && beaconsHTTP.status === 200) {
+            beacons = JSON.parse(beaconsHTTP.responseText);
+            console.log(beacons);
+            updateBeacons();
+        }
+    }
+
+    beaconsHTTP.open("GET", "./beacons.json", true);
+    beaconsHTTP.send();
+
+    /*setInterval(() => {
+        beaconsHTTP.open("GET", "./beacons.json", true);
+        beaconsHTTP.send();
+    }, 5000); // Refresh beacons every 5s
+    */
+}
