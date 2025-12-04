@@ -13,11 +13,13 @@ html, body {
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(255, 255, 255, 1);
+    background-color: rgba(220, 220, 220, .8);
     padding: 5px 10px;
     border-radius: 5px;
     font-family: Arial, sans-serif;
     font-size: 14px;
     z-index: 1000;
     pointer-events: none; /* Prevent interference with map interactions */
+    white-space: pre-line;
+    text-align: center;
 }
