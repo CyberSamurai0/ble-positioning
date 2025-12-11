@@ -7,6 +7,48 @@ import azure_api as cloud
 from local_web import API
 from sensors import SensorCache
 
+DEBUG = True
+
+def print_adv(device, adv_data, malformed=False):
+    # Print MAC Address and the hardcoded friendly name
+    print(f"Device: {color.blue(device.address)} ({color.blue(device.name)})")
+
+    print(f"\tLocal Name: {color.green(adv_data.local_name)}")
+
+    # Print the manufacturer's data payload.
+    # This traditionally consists of an integer ID assigned to the manufacturer
+    # and a bytestring data payload that is static or not service-related.
+    # Manufacturer IDs: https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf#page=217
+    print("\tManufacturer Data: {")
+    for manufacturer_id, value in adv_data.manufacturer_data.items():
+        print(f"\t\t{color.yellow(hex(manufacturer_id))}: {color.green(value)}")
+    print("\t}")
+
+
+    print("\tService Data: {")
+    if malformed:
+        for uuid, value in adv_data.service_data.items():
+            print(color.yellow(f"\t\t0x{uuid[4:8]}") + ": ", color.green(value))
+    else:
+        for uuid, value in adv_data.service_data.items():
+            print(color.yellow(f"\t\t0x{uuid[4:8]}") + ": {")
+
+            building_id = int.from_bytes(value[0:2], byteorder='big')
+            floor = value[2]
+            loc_north = int.from_bytes(value[3:5], byteorder='big')  # Needs to be converted to float16
+            loc_east = int.from_bytes(value[5:7], byteorder='big')  # Needs to be converted to float16
+
+            print(f"\t\t\tBuilding ID: {building_id}")
+            print(f"\t\t\tFloor: {floor}")
+            print(f"\t\t\tLocal North: {loc_north}")
+            print(f"\t\t\tLocal East: {loc_east}")
+
+            print("\t\t}")
+    print("\t}")
+
+    print(f"\tRSSI: {color.yellow(adv_data.rssi)}")
+    print(f"\tTx Power: {color.yellow(adv_data.tx_power)}")
+
 
 async def main():
     print("CNIT 546 BLE Positioning")
@@ -35,45 +77,23 @@ async def main():
         for uuid, value in adv_data.service_data.items():
             # Check if this is the Indoor Positioning Service
             if uuid[4:8] == "1821" and len(value) == 7:
-                building_id = value[0:2] # Needs to be converted to float16
+                building_id = int.from_bytes(value[0:2], byteorder='big')
                 floor = value[2]
-                loc_north = value[3:5]
-                loc_east = value[5:7]
+                loc_north = int.from_bytes(value[3:5], byteorder='big') # Needs to be converted to float16
+                loc_east = int.from_bytes(value[5:7], byteorder='big') # Needs to be converted to float16
 
                 beacons.record_sensor(Position(loc_north, loc_east, building_id, floor), adv_data.rssi)
 
+                if DEBUG:
+                    print_adv(device, adv_data, malformed=False)
+                return # Anything after this point implies a malformed/nonstandard payload
 
+
+        # Use this if we want to stop scanning for any reason
         #stop_event.set()
 
-        # Print MAC Address and the hardcoded friendly name
-        print(f"Device: {color.blue(device.address)} ({color.blue(device.name)})")
-
-        print(f"\tLocal Name: {color.green(adv_data.local_name)}")
-
-        # Print the manufacturer's data payload.
-        # This traditionally consists of an integer ID assigned to the manufacturer
-        # and a bytestring data payload. UTF-8 decoding tends to error :(
-        # Manufacturer IDs: https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf#page=217
-        print("\tManufacturer Data: {")
-        for manufacturer_id, value in adv_data.manufacturer_data.items():
-            print(f"\t\t{color.yellow(hex(manufacturer_id))}: {color.green(value)}")
-        print("\t}")
-
-        # This is an unstable field and probably does not need to be used.
-        # print(f"\tPlatform Data: ({adv_data.platform_data})")
-
-        # So far, this field is empty on all received packets. That may not hold
-        # true once we dive into testing!
-        # print(f"\tService Data: {adv_data.service_data}")
-        print("\tService Data: {")
-        for uuid, value in adv_data.service_data.items():
-            print(color.yellow(f"\t\t0x{uuid[4:8]}") + ":", color.green(value))
-        print("\t}")
-
-        #print(f"\tPayload: \x1b[32m{adv_data.manufacturer_data}\x1b[0m")
-        print(f"\tRSSI: \x1b[33m{adv_data.rssi}\x1b[0m")
-        #print(f"\tTx Power: \x1b[33m{adv_data.tx_power}\x1b[0m")
-        # print(adv_data)
+        print(color.red("[!!!] MALFORMED PAYLOAD [!!!]"))
+        print_adv(device, adv_data, malformed=True)
 
 
     async with BleakScanner(callback) as scanner:
