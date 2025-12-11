@@ -7,7 +7,7 @@
 
 #define VERSION_MAJOR '0'
 #define VERSION_MINOR '1'
-#define VERSION_PATCH '5'
+#define VERSION_PATCH '7'
 
 
 const uint16_t building_id = 0x0001;
@@ -21,10 +21,13 @@ static const uint8_t manufacturer_data[] = {
     'v', VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
 };
 
-static const uint8_t service_data[] = {
+static uint8_t service_data[] = {
     // Use Indoor Positioning Service Shorthand UUID
     0x21, 0x18, // 16-bit shorthand UUID (little endian)
-    2, 6 // Sample XY Coordinate System
+    (uint8_t)(building_id>>8), (uint8_t)(building_id & 0xFF), // 16-bit building ID (big endian)
+    floor_number,
+    0, 0, // Placeholder for two-byte local_north value
+    0, 0, // Placeholder for two-byte local_east value
 };
 
 static const struct bt_data adv_payload[] = {
@@ -74,7 +77,7 @@ static const struct bt_le_adv_param *adv_params = BT_LE_ADV_PARAM(
     // Do not use BT_LE_ADV_OPT_EXT_ADV as we want backward compatibility with BLE 4.0
     //BT_LE_ADV_OPT_CONN | // Advertise as connectable
     BT_LE_ADV_OPT_SCANNABLE | // Advertise as scannable
-    //BT_LE_ADV_OPT_USE_IDENTITY | // Uses the true MAC rather than randomized
+    BT_LE_ADV_OPT_USE_IDENTITY | // Uses the true MAC rather than randomized
     BT_LE_ADV_OPT_USE_NAME,
 
     ADV_INTERVAL_MIN, // Minimum interval
@@ -106,6 +109,31 @@ int main(void) {
         printk("BLE initialization did not complete in time\n");
         error(); // Block further execution with error handling
     }
+
+    uint16_t north_cast = 0;
+    uint16_t east_cast = 0;
+
+    memcpy(&north_cast, &local_north, sizeof(float16_t));
+    memcpy(&east_cast, &local_east, sizeof(float16_t));
+
+    //memcpy(&service_data[5], &local_north, 2);
+    //memcpy(&service_data[7], &local_east, 2);
+
+    printk("We got past memcpy!\n");
+    printk("%d %d\n", (uint8_t)(north_cast>>8), (uint8_t)(north_cast & 0xFF));
+    printk("%d %d\n", (uint8_t)(east_cast>>8), (uint8_t)(east_cast & 0xFF));
+
+    // Set big-endian first byte for local north
+    service_data[5] = (uint8_t)(north_cast >> 8);
+    // Set big-endian second byte for local north
+    service_data[6] = (uint8_t)(north_cast & 0xFF);
+
+    // Set big-endian first byte for local east
+    service_data[7] = (uint8_t)(east_cast >> 8);
+    // Set big-endian second byte for local east
+    service_data[8] = (uint8_t)(east_cast & 0xFF);
+
+    printk("We got past array writes!\n");
 
     err = bt_le_adv_start(adv_params, adv_payload, ARRAY_SIZE(adv_payload), NULL, 0);
 
