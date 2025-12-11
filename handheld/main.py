@@ -6,6 +6,7 @@ from position import Position
 import azure_api as cloud
 from local_web import API
 from sensors import SensorCache
+from numpy import frombuffer
 
 DEBUG = False
 
@@ -39,8 +40,10 @@ async def main():
             if uuid[4:8] == "1821" and len(value) == 7:
                 building_id = int.from_bytes(value[0:2], byteorder='big')
                 floor = value[2]
-                loc_north = int.from_bytes(value[3:5], byteorder='big') # Needs to be converted to float16
-                loc_east = int.from_bytes(value[5:7], byteorder='big') # Needs to be converted to float16
+                # Use numpy float16 type based on big-endian buffer
+                # ">f2" : '>' means big endian, 'f' means float, '2' means 2 bytes
+                loc_north = frombuffer(value[3:5], dtype=">f2")[0]
+                loc_east = frombuffer(value[5:7], dtype=">f2")[0]
 
                 beacons.record_sensor(Position(loc_north, loc_east, building_id, floor), adv_data.rssi)
 
