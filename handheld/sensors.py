@@ -24,7 +24,6 @@ class SensorCache:
 
 
     def record_sensor(self, pos, rssi):
-        print("record_sensor invoked for", pos.loc_north, pos.loc_east, "with", rssi)
         if type(pos) is not Position:
             return
 
@@ -49,7 +48,6 @@ class SensorCache:
                 # skip duplicate
                 entry['time'] = now
                 self.cache[key] = entry
-                print("Skipping Duplicate")
                 return
 
         entry['history'].append(rssi)
