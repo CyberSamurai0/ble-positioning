@@ -110,18 +110,14 @@ int main(void) {
         error(); // Block further execution with error handling
     }
 
+    // Convert float16_t to uint16_t for transmission
     uint16_t north_cast = 0;
     uint16_t east_cast = 0;
 
     memcpy(&north_cast, &local_north, sizeof(float16_t));
     memcpy(&east_cast, &local_east, sizeof(float16_t));
 
-    //memcpy(&service_data[5], &local_north, 2);
-    //memcpy(&service_data[7], &local_east, 2);
-
-    printk("We got past memcpy!\n");
-    printk("%d %d\n", (uint8_t)(north_cast>>8), (uint8_t)(north_cast & 0xFF));
-    printk("%d %d\n", (uint8_t)(east_cast>>8), (uint8_t)(east_cast & 0xFF));
+    // Convert uint16_t to big-endian bytes
 
     // Set big-endian first byte for local north
     service_data[5] = (uint8_t)(north_cast >> 8);
@@ -133,8 +129,8 @@ int main(void) {
     // Set big-endian second byte for local east
     service_data[8] = (uint8_t)(east_cast & 0xFF);
 
-    printk("We got past array writes!\n");
 
+    // Begin Advertising
     err = bt_le_adv_start(adv_params, adv_payload, ARRAY_SIZE(adv_payload), NULL, 0);
 
     if (err) {
