@@ -25,7 +25,7 @@ class API:
         async def get_position():
             return self.position.dict()
 
-        print("Webserver Initialized. Visit https://localhost:5000/")
+        print("Webserver Initialized. Visit http://localhost:5000/")
 
     async def run(self):
         await self.app.run_task()
