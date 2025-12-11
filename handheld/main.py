@@ -7,47 +7,7 @@ import azure_api as cloud
 from local_web import API
 from sensors import SensorCache
 
-DEBUG = True
-
-def print_adv(device, adv_data, malformed=False):
-    # Print MAC Address and the hardcoded friendly name
-    print(f"Device: {color.blue(device.address)} ({color.blue(device.name)})")
-
-    print(f"\tLocal Name: {color.green(adv_data.local_name)}")
-
-    # Print the manufacturer's data payload.
-    # This traditionally consists of an integer ID assigned to the manufacturer
-    # and a bytestring data payload that is static or not service-related.
-    # Manufacturer IDs: https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf#page=217
-    print("\tManufacturer Data: {")
-    for manufacturer_id, value in adv_data.manufacturer_data.items():
-        print(f"\t\t{color.yellow(hex(manufacturer_id))}: {color.green(value)}")
-    print("\t}")
-
-
-    print("\tService Data: {")
-    if malformed:
-        for uuid, value in adv_data.service_data.items():
-            print(color.yellow(f"\t\t0x{uuid[4:8]}") + ": ", color.green(value))
-    else:
-        for uuid, value in adv_data.service_data.items():
-            print(color.yellow(f"\t\t0x{uuid[4:8]}") + ": {")
-
-            building_id = int.from_bytes(value[0:2], byteorder='big')
-            floor = value[2]
-            loc_north = int.from_bytes(value[3:5], byteorder='big')  # Needs to be converted to float16
-            loc_east = int.from_bytes(value[5:7], byteorder='big')  # Needs to be converted to float16
-
-            print(f"\t\t\tBuilding ID: {building_id}")
-            print(f"\t\t\tFloor: {floor}")
-            print(f"\t\t\tLocal North: {loc_north}")
-            print(f"\t\t\tLocal East: {loc_east}")
-
-            print("\t\t}")
-    print("\t}")
-
-    print(f"\tRSSI: {color.yellow(adv_data.rssi)}")
-    print(f"\tTx Power: {color.yellow(adv_data.tx_power)}")
+DEBUG = False
 
 
 async def main():
@@ -98,6 +58,47 @@ async def main():
 
     async with BleakScanner(callback) as scanner:
         await stop_event.wait()
+
+
+def print_adv(device, adv_data, malformed=False):
+    # Print MAC Address and the hardcoded friendly name
+    print(f"Device: {color.blue(device.address)} ({color.blue(device.name)})")
+
+    print(f"\tLocal Name: {color.green(adv_data.local_name)}")
+
+    # Print the manufacturer's data payload.
+    # This traditionally consists of an integer ID assigned to the manufacturer
+    # and a bytestring data payload that is static or not service-related.
+    # Manufacturer IDs: https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf#page=217
+    print("\tManufacturer Data: {")
+    for manufacturer_id, value in adv_data.manufacturer_data.items():
+        print(f"\t\t{color.yellow(hex(manufacturer_id))}: {color.green(value)}")
+    print("\t}")
+
+
+    print("\tService Data: {")
+    if malformed:
+        for uuid, value in adv_data.service_data.items():
+            print(color.yellow(f"\t\t0x{uuid[4:8]}") + ": ", color.green(value))
+    else:
+        for uuid, value in adv_data.service_data.items():
+            print(color.yellow(f"\t\t0x{uuid[4:8]}") + ": {")
+
+            building_id = int.from_bytes(value[0:2], byteorder='big')
+            floor = value[2]
+            loc_north = int.from_bytes(value[3:5], byteorder='big')  # Needs to be converted to float16
+            loc_east = int.from_bytes(value[5:7], byteorder='big')  # Needs to be converted to float16
+
+            print(f"\t\t\tBuilding ID: {building_id}")
+            print(f"\t\t\tFloor: {floor}")
+            print(f"\t\t\tLocal North: {loc_north}")
+            print(f"\t\t\tLocal East: {loc_east}")
+
+            print("\t\t}")
+    print("\t}")
+
+    print(f"\tRSSI: {color.yellow(adv_data.rssi)}")
+    print(f"\tTx Power: {color.yellow(adv_data.tx_power)}")
 
 
 if __name__ == '__main__':
