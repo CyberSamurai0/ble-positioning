@@ -16,7 +16,7 @@ async def main():
     # Store calculated position value
     pos = Position()
 
-    sensors = SensorCache(5)
+    beacons = SensorCache(5)
 
     # Create Quart endpoint
     web = API(pos)
