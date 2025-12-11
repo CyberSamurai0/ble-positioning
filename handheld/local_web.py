@@ -32,7 +32,7 @@ class API:
 
         @self.app.route("/beacons", methods=["GET"])
         async def get_beacons():
-            return self.beacons.cache
+            return self.beacons.json()
 
         print("Webserver Initialized. Visit http://localhost:5000/")
 

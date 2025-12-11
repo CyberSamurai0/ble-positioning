@@ -2,6 +2,7 @@ import numbers
 from collections import deque
 from position import Position
 import time
+import json
 
 class SensorCache:
     def __init__(self, expiry_time):
@@ -32,7 +33,8 @@ class SensorCache:
                 'time': 0,
                 'avg_rssi': 0,
             }
-        
+
+
         entry['history'].append(rssi)
         entry['time'] = time.time()
 
@@ -71,3 +73,18 @@ class SensorCache:
 
         # Implement algorithm
         pass
+
+    def json(self):
+        assemble = []
+        for pos, val in self.cache.items():
+            building_id, floor, loc_north, loc_east = pos
+            assemble.append({
+                "loc_north": loc_north,
+                "loc_east": loc_east,
+                "building_id": building_id,
+                "floor": floor,
+                "rssi": val['avg_rssi'],
+                "history": list(val['history'])
+            })
+
+        return json.dumps(assemble)
