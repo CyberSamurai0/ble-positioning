@@ -19,7 +19,7 @@ async def main():
     beacons = SensorCache(5)
 
     # Create Quart endpoint
-    web = API(pos)
+    web = API(pos, beacons)
     server_task = asyncio.create_task(web.run())
 
     # Reference: https://bleak.readthedocs.io/en/latest/api/scanner.html#starting-and-stopping
@@ -30,6 +30,18 @@ async def main():
     def callback(device, adv_data):
         if device.name != "blepos":
             return
+
+
+        for uuid, value in adv_data.service_data.items():
+            # Check if this is the Indoor Positioning Service
+            if uuid[4:8] == "1821" and len(value) == 7:
+                building_id = value[0:2] # Needs to be converted to float16
+                floor = value[2]
+                loc_north = value[3:5]
+                loc_east = value[5:7]
+
+                beacons.record_sensor(Position(loc_north, loc_east, building_id, floor), adv_data.rssi)
+
 
         #stop_event.set()
 
