@@ -2,13 +2,18 @@ from quart import Quart
 import json
 import position
 import asyncio
+from sensors import SensorCache
 
 class API:
-    def __init__(self, pos):
+    def __init__(self, pos, beacons):
         if type(pos) is not position.Position:
             return
 
+        if type(beacons) is not SensorCache:
+            return
+
         self.position = pos
+        self.beacons = beacons
 
         # Use webroot for static files instead of /static/
         self.app = Quart(__name__, static_url_path='')
@@ -24,6 +29,10 @@ class API:
         @self.app.route("/json", methods=["GET"])
         async def get_position():
             return self.position.dict()
+
+        @self.app.route("/beacons", methods=["GET"])
+        async def get_beacons():
+            return self.beacons.cache
 
         print("Webserver Initialized. Visit http://localhost:5000/")
 
