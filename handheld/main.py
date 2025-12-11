@@ -2,7 +2,7 @@ import asyncio
 # Use the Bluetooth Low Energy platform Agnostic Klient (BLEAK) library
 from bleak import BleakScanner
 import tty_color as color
-import position
+from position import Position
 import azure_api as cloud
 from local_web import API
 from sensors import SensorCache
@@ -14,7 +14,7 @@ async def main():
     print("Scan Results:")
 
     # Store calculated position value
-    pos = position.Position()
+    pos = Position()
 
     sensors = SensorCache(5)
 
