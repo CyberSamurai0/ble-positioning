@@ -9,14 +9,17 @@ class API:
             return
 
         self.position = pos
-        self.app = Quart(__name__)
+
+        # Use webroot for static files instead of /static/
+        self.app = Quart(__name__, static_url_path='')
 
         # Define endpoint handlers within the initializer
         # as we can't do so at compile time unless the
         # Flask instance is made global.
         @self.app.route("/")
         async def index():
-            return "hi"
+            # Serve ./static/index.html as webroot
+            return await self.app.send_static_file("index.html")
 
         @self.app.route("/json", methods=["GET"])
         async def get_position():
