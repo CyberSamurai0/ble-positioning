@@ -3,10 +3,18 @@
 #include <zephyr/kernel.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/dsp/types.h>
 
 #define VERSION_MAJOR '0'
 #define VERSION_MINOR '1'
 #define VERSION_PATCH '5'
+
+
+const uint16_t building_id = 0x0001;
+const uint8_t floor_number = 4;
+const float16_t local_north = 1600.0f;
+const float16_t local_east = 1600.0f;
+
 
 static const uint8_t manufacturer_data[] = {
     0xFF, 0xFF, // Company ID (0xFFFF for testing)
