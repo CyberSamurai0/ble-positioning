@@ -18,9 +18,13 @@ class SensorCache:
         # If set to 0, do not remove old sensors from the cache. This will make best-fit
         # selection more costly.
         self.expiry_time = expiry_time
+        # Minimum time (seconds) between appending identical samples for the same sensor
+        # This helps deduplicate rapid duplicate callbacks (advertisement + scan response)
+        self._min_append_interval = 0.02
 
 
     def record_sensor(self, pos, rssi):
+        print("record_sensor invoked for", pos.loc_north, pos.loc_east, "with", rssi)
         if type(pos) is not Position:
             return
 
@@ -34,9 +38,22 @@ class SensorCache:
                 'avg_rssi': 0,
             }
 
+        now = time.time()
+
+        # If the most recent recorded RSSI is identical, and we recorded it
+        # very recently, skip appending to avoid duplicates coming from
+        # advertisement + scan-response or duplicated callbacks.
+        last_val = entry['history'][-1] if entry['history'] else None
+        if last_val is not None and last_val == rssi:
+            if (now - entry['time']) < self._min_append_interval:
+                # skip duplicate
+                entry['time'] = now
+                self.cache[key] = entry
+                print("Skipping Duplicate")
+                return
 
         entry['history'].append(rssi)
-        entry['time'] = time.time()
+        entry['time'] = now
 
         # Compute average and variance
         vals = list(entry['history'])
