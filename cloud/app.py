@@ -1,10 +1,11 @@
 import os
 import json
-import jwt
 import datetime
+import jwt
+from hmac import compare_digest as safe_str_cmp
+
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import safe_str_cmp
 
 # ------------------------------------------------------
 # Load secrets
@@ -13,19 +14,21 @@ JWT_SECRET = os.getenv("JWT_SECRET", "change-me-in-prod")
 REGISTRATION_SECRET = os.getenv("REGISTRATION_SECRET", "change-me-in-prod")
 
 # ------------------------------------------------------
-# Convert Azure PostgreSQL connection string to SQLAlchemy URI
+# Convert Azure PostgreSQL connection string → SQLAlchemy URL
 # ------------------------------------------------------
 def convert_azure_pg_connstr(raw: str) -> str:
     """
     Convert Azure-style Postgres connection string into SQLAlchemy URL.
-    Example Azure format:
-      Server=tcp:xxx.postgres.database.azure.com;Database=dbname;Port=5432;User Id=user@xxx;Password=pass;
-    Returns SQLAlchemy URL:
-      postgresql+psycopg2://user:pass@xxx.postgres.database.azure.com:5432/dbname
+    Azure example:
+      Database=mydb;Server=myserver.postgres.database.azure.com;
+      User Id=user@myserver;Password=pass;Port=5432;
+    Returns:
+      postgresql+psycopg2://user:pass@host:port/dbname
     """
     if not raw:
         return None
 
+    # Split Azure semicolon style "Key=Value"
     parts = dict(
         segment.split("=", 1) for segment in raw.split(";") if "=" in segment
     )
@@ -42,19 +45,29 @@ def convert_azure_pg_connstr(raw: str) -> str:
     return f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{db}"
 
 
-# Read the Azure-injected connection string
-raw_azure_conn = os.getenv("POSTGRESQLCONNSTR_AZURE_POSTGRESQL_CONNECTIONSTRING")
-DB_URL = convert_azure_pg_connstr(raw_azure_conn)
+# ------------------------------------------------------
+# Azure Connection String Handling
+# ------------------------------------------------------
+# Azure injects a variable: POSTGRESQLCONNSTR_<NAME>
+# If your connection string is called AZURE_POSTGRESQL_CONNECTIONSTRING,
+# Azure will expose: POSTGRESQLCONNSTR_AZURE_POSTGRESQL_CONNECTIONSTRING
+raw_azure_conn = None
+for key, val in os.environ.items():
+    if key.startswith("POSTGRESQLCONNSTR_"):
+        raw_azure_conn = val
+        break
 
-if not DB_URL:
+if not raw_azure_conn:
     raise RuntimeError(
-        "Azure PostgreSQL connection string not found. "
-        "Ensure a connection string named AZURE_POSTGRESQL_CONNECTIONSTRING "
-        "is defined in Settings > Configuration > Connection strings."
+        "No Azure PostgreSQL connection string found. "
+        "Define a Connection String under Settings > Configuration > Connection Strings "
+        "with type 'PostgreSQL' and name 'AZURE_POSTGRESQL_CONNECTIONSTRING'."
     )
 
+DB_URL = convert_azure_pg_connstr(raw_azure_conn)
+
 # ------------------------------------------------------
-# Flask + Database Setup
+# Flask Setup
 # ------------------------------------------------------
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URL
@@ -84,9 +97,15 @@ class Position(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.now())
 
 
-# Creates tables automatically if they don't exist
-with app.app_context():
-    db.create_all()
+# ------------------------------------------------------
+# Run table creation only on actual boot, not import
+# ------------------------------------------------------
+@app.before_first_request
+def init_database():
+    try:
+        db.create_all()
+    except Exception as e:
+        print("DATABASE INITIALIZATION ERROR:", e, flush=True)
 
 
 # ------------------------------------------------------
@@ -96,22 +115,19 @@ def create_device_jwt(device_id: str) -> str:
     payload = {
         "device_id": device_id,
         "iat": datetime.datetime.utcnow(),
-        # No expiration – per your spec
     }
-    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
-    return token
+    return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
 
 
 def verify_jwt(token: str):
     try:
-        decoded = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-        return decoded
+        return jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
     except jwt.InvalidTokenError:
         return None
 
 
 # ------------------------------------------------------
-# /api/register — Issues JWTs to devices
+# /api/register — Issues JWTs
 # ------------------------------------------------------
 @app.route("/api/register", methods=["POST"])
 def register_device():
@@ -127,7 +143,6 @@ def register_device():
 
     token = create_device_jwt(device_id)
 
-    # Save active token
     entry = ActiveJWT(token=token, device_id=device_id)
     db.session.add(entry)
     db.session.commit()
@@ -136,11 +151,11 @@ def register_device():
 
 
 # ------------------------------------------------------
-# /api/position — Accepts telemetry data
+# /api/position — Device telemetry ingestion
 # ------------------------------------------------------
 @app.route("/api/position", methods=["POST"])
 def position():
-    # Authenticate
+    # Authentication
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
         return jsonify({"error": "missing or invalid Authorization header"}), 401
@@ -157,10 +172,9 @@ def position():
     # Data validation
     data = request.get_json(silent=True) or {}
     required = ["building_id", "floor", "loc_east", "loc_north"]
-    if not all(key in data for key in required):
+    if not all(k in data for k in required):
         return jsonify({"error": "missing required fields"}), 400
 
-    # Save position
     entry = Position(
         device_id=device_id,
         building_id=data["building_id"],
@@ -183,7 +197,8 @@ def root():
 
 
 # ------------------------------------------------------
-# Required for Azure
+# Local Development Only
+# Azure will ignore this and use Gunicorn
 # ------------------------------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
