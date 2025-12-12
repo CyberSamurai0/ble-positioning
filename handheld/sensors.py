@@ -98,7 +98,7 @@ class SensorCache:
                 "loc_east": loc_east,
                 "building_id": building_id,
                 "floor": floor,
-                "rssi": val['avg_rssi'],
+                "avg_rssi": val['avg_rssi'],
                 "history": list(val['history'])
             })
 
