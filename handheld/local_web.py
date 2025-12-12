@@ -28,7 +28,8 @@ class API:
 
         @self.app.route("/json", methods=["GET"])
         async def get_position():
-            return self.position.dict()
+            x, y = beacons.trilaterate()
+            return json.dumps({"x": x, "y": y})
 
         @self.app.route("/beacons", methods=["GET"])
         async def get_beacons():
