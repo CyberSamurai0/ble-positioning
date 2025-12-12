@@ -135,8 +135,8 @@ if (SHOW_BEACONS) {
         }
     }
 
-    beaconsHTTP.open("GET", "./beacons", true);
     // Send a request immediately
+    beaconsHTTP.open("GET", "./beacons", true);
     beaconsHTTP.send();
 
     // Send a request indefinitely every 3 seconds
