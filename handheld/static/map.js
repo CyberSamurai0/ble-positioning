@@ -10,6 +10,21 @@ let map = L.map("map", {
     zoomControl: !DISABLE_ZOOM,
 });
 
+function metersToPixels(meters) {
+    if (typeof meters !== "number") return;
+
+    // With the current floorplan, 1ft=30px
+    // First convert to feet, then to pixels
+    return meters * 3.28084 * 30;
+}
+
+function pixelsToMeters(px) {
+    if (typeof px !== "number") return;
+
+    // Divide by 30 and then 3.28084
+    return px / 98.4252
+}
+
 function getImageDimensions(imageURL) {
     return new Promise((resolve, reject) => {
         const img = new Image();
