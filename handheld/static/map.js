@@ -3,6 +3,8 @@ const MAX_ZOOM = 0;
 const DISABLE_ZOOM = false;
 const SHOW_BEACONS = true; // TODO disable beacon markers in release
 
+import {metersToPixels, pixelsToMeters, getImageDimensions} from "./helpers.js"
+
 let map = L.map("map", {
     crs: L.CRS.Simple,
     minZoom: MIN_ZOOM,
@@ -10,38 +12,14 @@ let map = L.map("map", {
     zoomControl: !DISABLE_ZOOM,
 });
 
-function metersToPixels(meters) {
-    if (typeof meters !== "number") return;
-
-    // With the current floorplan, 1ft=30px
-    // First convert to feet, then to pixels
-    return meters * 3.28084 * 30;
-}
-
-function pixelsToMeters(px) {
-    if (typeof px !== "number") return;
-
-    // Divide by 30 and then 3.28084
-    return px / 98.4252
-}
-
-function getImageDimensions(imageURL) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-            resolve({ width: img.width, height: img.height });
-        }
-
-        img.onerror = reject;
-        img.src = imageURL;
-    });
-}
-
 map.on('mousemove', e => {
     const coordinateBox = document.getElementById('coordinate-box');
     const lat = e.latlng.lat.toFixed(2); // Limit to 4 decimal places
     const lng = e.latlng.lng.toFixed(2);
-    coordinateBox.textContent = `Coordinates: (${lat}, ${lng})\r\nFeet: (${(lat/30).toFixed(2)}, ${(lng/30).toFixed(2)})`;
+
+    const m_north = pixelsToMeters(e.latlng.lat).toFixed(2);
+    const m_east = pixelsToMeters(e.latlng.lng).toFixed(2);
+    coordinateBox.textContent = `Coordinates: (${lat}, ${lng})\r\nFeet: (${(lat/30).toFixed(2)}, ${(lng/30).toFixed(2)})\r\nMeters: ${m_north}, ${m_east}`;
 });
 
 getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
