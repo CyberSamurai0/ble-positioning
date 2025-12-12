@@ -39,13 +39,20 @@ map.on('mousemove', e => {
 getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
     console.log("Current floorplan image dimensions:", dimensions);
 
-    // Define the map coordinate plane using 
+    // Define the map coordinate plane using image dimensions
     let bounds = [[0, 0], [dimensions.height, dimensions.width]];
+    // Apply the floorplan image to the map
     let image = L.imageOverlay("./floorplans/0001-04.png", bounds).addTo(map)
-    
+
+    // Fit the map to the image dimensions
     map.fitBounds(bounds);
+
+    // Center the map
     map.setView([dimensions.height-(dimensions.height/2), dimensions.width/2], -2)
 });
+
+
+/***** ATTEMPT TO RETRIEVE CALCULATED POSITION *****/
 
 const SHOW_POSITION = true;
 
@@ -74,6 +81,7 @@ if (SHOW_POSITION) {
 }
 
 /***** RETRIEVE LATEST BEACON POSITIONS *****/
+
 if (SHOW_BEACONS) {
     let beaconMarkers = [];
     let beaconData = [];
@@ -86,11 +94,6 @@ if (SHOW_BEACONS) {
     }
 
     function updateBeacons() {
-        // TODO go through beaconData and compare with beaconMarkers
-        // If a beacon is new, add it
-        // If a beacon is gone, remove it
-        // If a beacon is present, update its RSSI value
-
         // Go through existing markers and update RSSI
         for (let marker of beaconMarkers) {
             // Find matching beacon in beaconData
