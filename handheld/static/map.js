@@ -42,16 +42,49 @@ getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
 
 /***** RETRIEVE LATEST BEACON POSITIONS *****/
 if (SHOW_BEACONS) {
-    let beacons = [];
+    let beaconMarkers = [];
+    let beaconData = [];
 
     function addBeacon(lat, long) {
-        L.marker([lat, long]).addTo(map);
+        let marker = L.marker([lat, long]);
+        marker.addTo(map);
+        beaconMarkers.push(marker);
+        return marker;
     }
 
     function updateBeacons() {
-        for (let beacon of beacons) {
-            if (beacon.hasOwnProperty("loc_north") && beacon.hasOwnProperty("loc_east")) {
-                addBeacon(beacon.loc_north, beacon.loc_east);
+        // TODO go through beaconData and compare with beaconMarkers
+        // If a beacon is new, add it
+        // If a beacon is gone, remove it
+        // If a beacon is present, update its RSSI value
+
+        // Go through existing markers and update RSSI
+        for (let marker of beaconMarkers) {
+            // Find matching beacon in beaconData
+            let match = beaconData.find(beacon => beacon["loc_north"] === marker.getLatLng().lat && beacon["loc_east"] === marker.getLatLng().lng);
+
+            // If a match is present
+            if (match) {
+                // Update the popup with new RSSI value
+                marker.bindPopup(`RSSI: ${match["avg_rssi"]} dBm`);
+            } else { // Stale beacon, remove it
+                // Remove marker from beaconMarkers array
+                let toRemove = beaconMarkers.splice(beaconMarkers.indexOf(marker))[0];
+                // Remove the marker from the map
+                if (toRemove instanceof L.Layer) map.removeLayer(toRemove[0]);
+            }
+        }
+
+        for (let beacon of beaconData) {
+            // Check if beacon is already present in beaconMarkers
+            let match = beaconMarkers.find(marker => beacon["loc_north"] === marker.getLatLng().lat && beacon["loc_east"] === marker.getLatLng().lng);
+            // Assume already updated if match is found
+            // If no match, add a new marker
+            if (!match) {
+                // New beacon, add it
+                if (beacon.hasOwnProperty("loc_north") && beacon.hasOwnProperty("loc_east") && beacon.hasOwnProperty("avg_rssi")) {
+                    addBeacon(beacon.loc_north, beacon.loc_east).bindPopup(`RSSI: ${beacon["avg_rssi"]} dBm`);
+                }
             }
         }
     }
@@ -59,18 +92,18 @@ if (SHOW_BEACONS) {
     let beaconsHTTP = new XMLHttpRequest();
     beaconsHTTP.onreadystatechange = () => {
         if (beaconsHTTP.readyState === 4 && beaconsHTTP.status === 200) {
-            beacons = JSON.parse(beaconsHTTP.responseText);
-            console.log(beacons);
+            beaconData = JSON.parse(beaconsHTTP.responseText);
+            console.log(beaconData);
             updateBeacons();
+            console.log(beaconMarkers);
         }
     }
 
-    beaconsHTTP.open("GET", "./beacons.json", true);
+    beaconsHTTP.open("GET", "./beacons", true);
     beaconsHTTP.send();
 
-    /*setInterval(() => {
-        beaconsHTTP.open("GET", "./beacons.json", true);
+    setInterval(() => {
+        beaconsHTTP.open("GET", "./beacons", true);
         beaconsHTTP.send();
-    }, 5000); // Refresh beacons every 5s
-    */
+    }, 3000); // Refresh beacons every 3s
 }
