@@ -15,6 +15,11 @@ const uint8_t floor_number = 4;
 const float16_t local_north = 1600.0f;
 const float16_t local_east = 1600.0f;
 
+#define LED0_NODE DT_ALIAS(led0)
+#define LED2_NODE DT_ALIAS(led2)
+
+static const struct gpio_dt_spec RED_LED = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+static const struct gpio_dt_spec BLUE_LED = GPIO_DT_SPEC_GET(LED2_NODE, gpios);
 
 static const uint8_t manufacturer_data[] = {
     0xFF, 0xFF, // Company ID (0xFFFF for testing)
@@ -36,12 +41,6 @@ static const struct bt_data adv_payload[] = {
     // Optional Bluetooth display icon if we use the connectable state
     //BT_DATA_BYTES(BT_DATA_GAP_APPEARANCE, BT_BYTES_LIST_LE16(BT_APPEARANCE_SENSOR_WALL_MOUNTED)),
 };
-
-#define LED0_NODE DT_ALIAS(led0)
-#define LED2_NODE DT_ALIAS(led2)
-
-static const struct gpio_dt_spec RED_LED = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
-static const struct gpio_dt_spec BLUE_LED = GPIO_DT_SPEC_GET(LED2_NODE, gpios);
 
 // Create a semaphore that starts a 0 with a maximum number of 1
 // This allows us to delay main execution until on_bt_ready signals
