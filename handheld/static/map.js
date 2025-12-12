@@ -35,9 +35,11 @@ map.on('mousemove', e => {
         `Meters: (${m_north}, ${m_east})`;
 });
 
+// Set the map to scale based on the source image
 getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
-    console.log("Image dimensions:", dimensions);
-    
+    console.log("Current floorplan image dimensions:", dimensions);
+
+    // Define the map coordinate plane using 
     let bounds = [[0, 0], [dimensions.height, dimensions.width]];
     let image = L.imageOverlay("./floorplans/0001-04.png", bounds).addTo(map)
     
