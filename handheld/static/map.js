@@ -39,6 +39,31 @@ getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
     map.setView([dimensions.height-(dimensions.height/2), dimensions.width/2], -2)
 });
 
+const SHOW_POSITION = true;
+
+if (SHOW_POSITION) {
+    let positionMarker = L.marker([0, 0]).addTo(map);
+
+    let posHTTP = new XMLHttpRequest();
+    posHTTP.onreadystatechange = () => {
+        if (posHTTP.readyState === 4 && posHTTP.status === 200) {
+            let posData = JSON.parse(posHTTP.responseText);
+            console.log(posData);
+            if (posData.hasOwnProperty("x") && posData.hasOwnProperty("y")) {
+                positionMarker.setLatLng([posData.x, posData.y]);
+            }
+            //updateBeacons();
+        }
+    }
+
+    posHTTP.open("GET", "./json", true);
+    posHTTP.send();
+
+    setInterval(() => {
+        posHTTP.open("GET", "./json", true);
+        posHTTP.send();
+    }, 1000); // Refresh beacons every 3s
+}
 
 /***** RETRIEVE LATEST BEACON POSITIONS *****/
 if (SHOW_BEACONS) {
@@ -66,7 +91,7 @@ if (SHOW_BEACONS) {
             // If a match is present
             if (match) {
                 // Update the popup with new RSSI value
-                marker.bindPopup(`RSSI: ${match["avg_rssi"]} dBm`);
+                marker.bindPopup(`RSSI: ${match["avg_rssi"]} dBm\r\nDistance: ${match["distance"]}`);
             } else { // Stale beacon, remove it
                 // Remove marker from beaconMarkers array
                 let toRemove = beaconMarkers.splice(beaconMarkers.indexOf(marker))[0];
