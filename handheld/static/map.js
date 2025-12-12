@@ -125,7 +125,9 @@ if (SHOW_BEACONS) {
         }
     }
 
+    // Build HTTP request object that we reuse
     let beaconsHTTP = new XMLHttpRequest();
+    // Callback function for request complete
     beaconsHTTP.onreadystatechange = () => {
         if (beaconsHTTP.readyState === 4 && beaconsHTTP.status === 200) {
             beaconData = JSON.parse(beaconsHTTP.responseText);
@@ -134,10 +136,12 @@ if (SHOW_BEACONS) {
     }
 
     beaconsHTTP.open("GET", "./beacons", true);
+    // Send a request immediately
     beaconsHTTP.send();
 
+    // Send a request indefinitely every 3 seconds
     setInterval(() => {
         beaconsHTTP.open("GET", "./beacons", true);
         beaconsHTTP.send();
-    }, 3000); // Refresh beacons every 3s
+    }, 3000);
 }
