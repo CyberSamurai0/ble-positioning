@@ -12,6 +12,7 @@ class AzureDevice:
         self.client.connect()
         print("Azure IoT Hub device client connected.")
 
+    # Use our position class as a wrapper for building, floor, and coordinate
     def send_telemetry(self, pos):
         if not isinstance(pos, Position): return
 
