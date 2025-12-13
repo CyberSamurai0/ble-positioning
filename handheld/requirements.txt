@@ -12,3 +12,4 @@ charset-normalizer~=3.4.4
 requests~=2.32.5
 quart~=0.20.0
 numpy~=2.3.5
+azure-iot-device~=2.14.0
