@@ -11,8 +11,6 @@ from numpy import frombuffer, astype
 DEBUG = False
 
 # TODO LIST
-# Adjust coordinates of the beacons to be relevant
-# Revise webpage to render markers based on /beacons structure instead of beacons.json structure
 # Test trilateration
 
 async def main():
