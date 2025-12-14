@@ -1,5 +1,12 @@
 [
   {
+    "loc_north": 2930,
+    "loc_east": 1700,
+    "building": 1,
+    "floor": 4,
+    "avg_rssi": -60
+  },
+  {
     "loc_north": 2550,
     "loc_east": 2050,
     "building": 1,
@@ -7,8 +14,15 @@
     "avg_rssi": -60
   },
   {
+    "loc_north": 1900,
+    "loc_east": 2100,
+    "building": 1,
+    "floor": 4,
+    "avg_rssi": -60
+  },
+  {
     "loc_north": 1600,
-    "loc_east": 1780,
+    "loc_east": 1600,
     "building": 1,
     "floor": 4,
     "avg_rssi": -65
@@ -16,6 +30,13 @@
   {
     "loc_north": 2075,
     "loc_east": 1318,
+    "building": 1,
+    "floor": 4,
+    "avg_rssi": -70
+  },
+  {
+    "loc_north": 2550,
+    "loc_east": 1450,
     "building": 1,
     "floor": 4,
     "avg_rssi": -70
