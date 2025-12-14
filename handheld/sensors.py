@@ -11,6 +11,15 @@ PATH_LOSS = 1.61085143652
 def convert_rssi_to_distance(rssi, tx_power=TX_POWER, path_loss=PATH_LOSS):
     return 10 ** ((tx_power - rssi) / (10 * path_loss))
 
+# With the current floorplan, 1ft=30px
+# First convert to feet, then to pixels
+def meters_to_px(meters):
+    return meters * 3.28084 * 30
+
+# Divide by 30 and then 3.28084
+def px_to_meters(px):
+    return px / 98.4252
+
 
 class SensorCache:
     def __init__(self, expiry_time):
@@ -91,7 +100,6 @@ class SensorCache:
         # TODO implement
         return None, None, None
 
-
     def trilaterate(self):
         #a, b, c = self.get_best_sensors()
         # Retrieve using self.cache[a].rssi
@@ -100,9 +108,13 @@ class SensorCache:
 
         # Implement algorithm
         for (pos, val) in self.cache.items():
-            building_id, floor, loc_north, loc_east = pos
+            _, _, loc_north, loc_east = pos
             p.append([loc_north, loc_east, val['distance']])
-        pass
+            #p.append([px_to_meters(loc_north), px_to_meters(loc_east), val['distance']])
+
+        # Make sure we have minimum number of beacons
+        if len(p) < 3:
+            return None, None
 
         A = 2 * (p[1][0] - p[0][0]), 2 * (p[1][1] - p[0][1])
         B = 2 * (p[2][0] - p[0][0]), 2 * (p[2][1] - p[0][1])
