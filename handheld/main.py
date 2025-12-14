@@ -3,7 +3,6 @@ import asyncio
 from bleak import BleakScanner
 import tty_color as color
 from position import Position
-import azure_api as cloud
 from local_web import API
 from sensors import SensorCache
 from numpy import frombuffer, astype
