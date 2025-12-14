@@ -4,6 +4,7 @@ from position import Position
 import time
 import json
 import numpy as np
+from kalman import Kalman1D
 
 TX_POWER = -66
 PATH_LOSS = 1.61085143652
@@ -53,6 +54,7 @@ class SensorCache:
                 'time': 0,
                 'avg_rssi': 0,
                 'distance': 0,
+                'kalman': Kalman1D()
             }
 
         now = time.time()
@@ -71,11 +73,13 @@ class SensorCache:
         entry['history'].append(rssi)
         entry['time'] = now
 
-        # Compute average and variance
-        vals = list(entry['history'])
-        entry['avg_rssi'] = sum(vals) / len(vals)
+        filtered_rssi = entry['kalman'].update(rssi)
+        entry['avg_rssi'] = filtered_rssi
 
-        entry['distance'] = convert_rssi_to_distance(entry['avg_rssi'])
+        min_d = 0.8  # meters
+        max_d = 12.0
+        dist = convert_rssi_to_distance(filtered_rssi)
+        entry['distance'] = max(min_d, min(max_d, dist))
 
         # Update the cache
         self.cache[key] = entry
