@@ -14,7 +14,7 @@ def convert_rssi_to_distance(rssi, tx_power=TX_POWER, path_loss=PATH_LOSS):
 # With the current floorplan, 1ft=30px
 # First convert to feet, then to pixels
 def meters_to_px(meters):
-    return meters * 3.28084 * 30
+    return meters * 98.4252
 
 # Divide by 30 and then 3.28084
 def px_to_meters(px):
@@ -109,8 +109,8 @@ class SensorCache:
         # Implement algorithm
         for (pos, val) in self.cache.items():
             _, _, loc_north, loc_east = pos
-            p.append([loc_north, loc_east, val['distance']])
-            #p.append([px_to_meters(loc_north), px_to_meters(loc_east), val['distance']])
+            #p.append([loc_north, loc_east, val['distance']])
+            p.append([px_to_meters(loc_north), px_to_meters(loc_east), val['distance']])
 
         # Make sure we have minimum number of beacons
         if len(p) < 3:
