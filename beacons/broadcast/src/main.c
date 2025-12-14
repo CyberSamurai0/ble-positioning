@@ -7,7 +7,7 @@
 
 #define VERSION_MAJOR '0'
 #define VERSION_MINOR '1'
-#define VERSION_PATCH '7'
+#define VERSION_PATCH '8'
 
 
 const uint16_t building_id = 0x0001;
@@ -168,6 +168,9 @@ static void on_bt_ready(int err) {
     }
 
     printk("Bluetooth initialized\n");
+    printk("Building %x, Floor %d\n", building_id, floor_number);
+    printk("Local North: %u\n", (uint16_t)(local_north));
+    printk("Local East: %u\n", (uint16_t)(local_east));
 
     // Signal that Bluetooth initialization is complete
     k_sem_give(&ble_init_ok);
