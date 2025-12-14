@@ -4,8 +4,7 @@ from azure.iot.device import IoTHubDeviceClient, Message
 from position import Position
 
 class AzureDevice:
-    def __init__(self):
-        connection_string = os.getenv("AZURE_IOT_CONNECTION_STRING")
+    def __init__(self, connection_string):
         if not connection_string:
             raise ValueError("Mandatory environment variable unset: AZURE_IOT_CONNECTION_STRING")
         self.client = IoTHubDeviceClient.create_from_connection_string(connection_string)
