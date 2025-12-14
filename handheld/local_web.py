@@ -28,6 +28,7 @@ class API:
 
         @self.app.route("/json", methods=["GET"])
         async def get_position():
+            beacons.clear_old_sensors()
             x, y = beacons.trilaterate()
             if x == None: x=0
             if y == None: y=0
