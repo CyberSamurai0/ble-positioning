@@ -76,8 +76,8 @@ class SensorCache:
         filtered_rssi = entry['kalman'].update(rssi)
         entry['avg_rssi'] = filtered_rssi
 
-        min_d = 0.8  # meters
-        max_d = 12.0
+        min_d = 0  # meters
+        max_d = 10.0
         dist = convert_rssi_to_distance(filtered_rssi)
         entry['distance'] = max(min_d, min(max_d, dist))
 
