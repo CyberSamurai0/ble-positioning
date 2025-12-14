@@ -36,7 +36,7 @@ class AzureDevice:
 
 def main():
     # Create AzureDevice with no parameters
-    device = AzureDevice()
+    device = AzureDevice(os.getenv("AZURE_IOT_CONNECTION_STRING"))
     
     try:
         # Create a sample Position object to send (matching Position class parameter order)
