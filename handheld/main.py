@@ -7,6 +7,8 @@ import azure_api as cloud
 from local_web import API
 from sensors import SensorCache
 from numpy import frombuffer, astype
+from azure_iot import AzureDevice
+import os
 
 DEBUG = False
 
@@ -92,8 +94,8 @@ def print_adv(device, adv_data, malformed=False):
 
             building_id = int.from_bytes(value[0:2], byteorder='big')
             floor = value[2]
-            loc_north = int.from_bytes(value[3:5], byteorder='big')  # Needs to be converted to float16
-            loc_east = int.from_bytes(value[5:7], byteorder='big')  # Needs to be converted to float16
+            loc_north = frombuffer(value[3:5], dtype=">f2")[0].astype(float)
+            loc_east = frombuffer(value[5:7], dtype=">f2")[0].astype(float)
 
             print(f"\t\t\tBuilding ID: {building_id}")
             print(f"\t\t\tFloor: {floor}")
