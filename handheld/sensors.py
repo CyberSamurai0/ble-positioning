@@ -50,7 +50,7 @@ class SensorCache:
         if entry is None:
             entry = {
                 # Store a history of RSSI values to smooth out fluctuations
-                'history': deque(maxlen=5),
+                'history': deque(maxlen=10),
                 'time': 0,
                 'avg_rssi': 0,
                 'distance': 0,
@@ -76,10 +76,11 @@ class SensorCache:
         filtered_rssi = entry['kalman'].update(rssi)
         entry['avg_rssi'] = filtered_rssi
 
-#        min_d = 0  # meters
-#        max_d = 10.0
-        entry['distance'] = convert_rssi_to_distance(filtered_rssi)
-#        entry['distance'] = max(min_d, min(max_d, dist))
+        min_d = 0  # meters
+        max_d = 10.0
+#        entry['distance'] = convert_rssi_to_distance(filtered_rssi)
+        dist = convert_rssi_to_distance(filtered_rssi)
+        entry['distance'] = max(min_d, min(max_d, dist))
 
         # Update the cache
         self.cache[key] = entry
