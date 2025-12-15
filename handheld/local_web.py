@@ -29,9 +29,13 @@ class API:
         @self.app.route("/json", methods=["GET"])
         async def get_position():
             beacons.clear_old_sensors()
-            x, y = beacons.trilaterate()
-            if x == None: x=0
-            if y == None: y=0
+            calc_pos = beacons.trilaterate()
+            if calc_pos is None:
+                return json.dumps({"x": 0, "y": 0, "xm": 0, "ym": 0})
+            x = calc_pos.loc_north
+            y = calc_pos.loc_east
+            if x is None: x = 0
+            if y is None: y = 0
             return json.dumps({"x": x * 98.4252, "y": y * 98.4252, "xm": x, "ym": y})
 
         @self.app.route("/beacons", methods=["GET"])
