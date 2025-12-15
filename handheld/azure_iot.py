@@ -13,14 +13,15 @@ class AzureDevice:
     
     # Use our position class as a wrapper for building, floor, and coordinate
     def send_telemetry(self, pos):
+        print("Send Telemetry Called")
         if not isinstance(pos, Position): 
             return
         payload = json.dumps({
             "device_id": "handheld-1",
             "building_id": pos.building_id,
             "floor": pos.floor,
-            "loc_north": pos.loc_north,
-            "loc_east": pos.loc_east
+            "loc_north": pos.loc_north * 98.4252,
+            "loc_east": pos.loc_east * 98.4252
         })
         message = Message(payload)
         message.content_type = "application/json"
