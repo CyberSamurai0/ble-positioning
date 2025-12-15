@@ -1,5 +1,5 @@
 class Kalman1D:
-    def __init__(self, q=0.01, r=1.0, initial_value=None):
+    def __init__(self, q=0.3, r=9.0, initial_value=None):
         self.q = q          # Process noise
         self.r = r          # Measurement noise
         self.x = initial_value  # State estimate
