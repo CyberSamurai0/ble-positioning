@@ -64,6 +64,7 @@ const SHOW_POSITION = true;
 if (SHOW_POSITION) {
     let positionIcon = Object.assign({}, L.Icon.Default.prototype.options, {
         iconUrl: './position2x.png',
+        iconRetinaUrl: './position2x.png'
     });
     let positionMarker = L.marker([0, 0], {icon: L.icon(positionIcon)}).addTo(map);
 
