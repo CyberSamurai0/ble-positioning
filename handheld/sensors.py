@@ -23,8 +23,9 @@ def px_to_meters(px):
 
 
 class SensorCache:
-    def __init__(self, expiry_time):
+    def __init__(self, expiry_time, on_trilaterate):
         self.cache = {}
+        self.on_trilaterate = on_trilaterate
 
         if not isinstance(expiry_time, numbers.Number):
             expiry_time = 0
@@ -111,20 +112,23 @@ class SensorCache:
         return best
 
     def trilaterate(self):
-        #a, b, c = self.get_best_sensors()
+        a, b, c = self.get_best_sensors()
         # Retrieve using self.cache[a].rssi
 
         p = list()
 
         # Implement algorithm
-        for (pos, val) in self.cache.items():
+        for pos in self.get_best_sensors():
+            if not pos:
+                continue
             _, _, loc_north, loc_east = pos
+            val = self.cache[pos]
             #p.append([loc_north, loc_east, val['distance']])
             p.append([px_to_meters(loc_north), px_to_meters(loc_east), val['distance']])
 
         # Make sure we have minimum number of beacons
         if len(p) < 3:
-            return None, None
+            return None
 
         A = 2 * (p[1][0] - p[0][0]), 2 * (p[1][1] - p[0][1])
         B = 2 * (p[2][0] - p[0][0]), 2 * (p[2][1] - p[0][1])
@@ -137,10 +141,13 @@ class SensorCache:
 
         try:
             x, y = np.linalg.solve(M, Y)
-            return x, y
+            building_id, floor, _, _ = a # Extract from best pos tuple
+            calc_pos = Position(x, y, building_id, floor)
+            self.on_trilaterate(calc_pos)
+            return calc_pos
         except np.linalg.LinAlgError:
             print("Error: Beacons may be collinear or distances invalid")
-            return None, None
+            return None
 
 
     def json(self):

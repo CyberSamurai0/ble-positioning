@@ -22,7 +22,13 @@ async def main():
     # Store calculated position value
     pos = Position()
 
-    beacons = SensorCache(15)
+
+    az = AzureDevice(os.getenv("AZURE_IOT_CONNECTION_STRING"))
+
+    def on_trilaterate(calc_pos):
+        az.send_telemetry(calc_pos)
+
+    beacons = SensorCache(15, on_trilaterate)
 
     # Create Quart endpoint
     web = API(pos, beacons)
