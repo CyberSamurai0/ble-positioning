@@ -99,11 +99,16 @@ class SensorCache:
             del self.cache[pos]
 
     def get_best_sensors(self):
-        # Prioritize recency, then proximity
-        # Return three cache objects (position and RSSI)
+        sensors = [(val['distance'], pos) for pos, val in self.cache.items()]
+        # Sort by distance (lowest first)
+        sensors.sort(key=lambda x: x[0])
 
-        # TODO implement
-        return None, None, None
+        # Get up to three positions, padding with None if fewer than three
+        best = [pos for _, pos in sensors[:3]]
+        while len(best) < 3:
+            best.append(None)
+
+        return best
 
     def trilaterate(self):
         #a, b, c = self.get_best_sensors()
