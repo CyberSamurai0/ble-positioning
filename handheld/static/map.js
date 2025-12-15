@@ -50,7 +50,7 @@ getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
     // Center the map
     map.setView([dimensions.height-(dimensions.height/2), dimensions.width/2], -2);
 
-    L.rectangle([[1500, 1200], [3050, 2400]]).addTo(map);
+    L.rectangle([[1370, 1100], [3150, 2600]]).addTo(map);
     L.rectangle([[3700, 3500], [2800, 4550]]).setStyle({color: "#ff0000"}).addTo(map);
 
 
