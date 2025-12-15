@@ -62,7 +62,10 @@ getImageDimensions("./floorplans/0001-04.png").then(dimensions => {
 const SHOW_POSITION = true;
 
 if (SHOW_POSITION) {
-    let positionMarker = L.marker([0, 0]).addTo(map);
+    let positionIcon = Object.assign({}, L.Icon.Default.prototype.options, {
+        iconUrl: './position2x.png',
+    });
+    let positionMarker = L.marker([0, 0], {icon: L.icon(positionIcon)}).addTo(map);
 
     let posHTTP = new XMLHttpRequest();
     posHTTP.onreadystatechange = () => {
